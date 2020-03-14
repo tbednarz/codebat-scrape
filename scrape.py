@@ -1,14 +1,18 @@
 from bs4 import BeautifulSoup
 import requests
 
-url = 'https://codingbat.com/java/Warmup-1'
-response = requests.get(url, timeout=5)
+url = 'codingbat.com'
+response = requests.get('https://codingbat.com/java/Warmup-1', timeout=5)
 content = BeautifulSoup(response.content, "html.parser")
 
-for ana in content.findAll('a'):
-    if ana.parent.name == "td":
-        print(ana)
 
+links = content.find_all("a", href=lambda href: href and "prob" in href)
+for link in links:
+    backUrl = link.get("href")
+    realUrl = url + backUrl
+    f = open("links.txt", "a")
+    f.write(realUrl + "\n")
+    f.close
 # indent = content.find('div', attrs={"class": "indent"})
 # table = indent.find('table')
 # links = table.find("tr")
