@@ -3,26 +3,34 @@ from bs4 import BeautifulSoup
 import requests
 
 # provide url to requests.get() to get the sites data
-url = 'codingbat.com'
-response = requests.get('https://codingbat.com/java/Warmup-1', timeout=5)
-
+urlHalf = 'codingbat.com'
 # turn the response into soup
-content = BeautifulSoup(response.content, "html.parser")
 
-# find every link on the page, filtering for only links that include "prob" in the href
-links = content.find_all("a", href=lambda href: href and "prob" in href)
+# provide a url "https://codingbat.com/python OR java /Warmup-1, Warmup-2 etc"
 
-# for each link, get the href aka the backUrl, sinces its the second half
-# join the backUrl with the url from above
-# then write the result to links.txt
-for link in links:
-    backUrl = link.get("href")
-    realUrl = url + backUrl
-    f = open("links.txt", "a")
-    f.write(realUrl + "\n")
-    f.close
 
-    # HERE I WAS TRYING TO FIGURE OUT BEAUTIFUL SOUP AND HOW TO CRAWL AROUND
+def make_link(url):
+    response = requests.get(url, timeout=5)
+    content = BeautifulSoup(response.content, "html.parser")
+    links = content.find_all("a", href=lambda href: href and "prob" in href)
+    linkList = {}
+    for link in links:
+        text = link.text
+        backUrl = link.get("href")
+        realUrl = "http://" + urlHalf + backUrl
+        linkList.update({text: realUrl})
+    return(linkList)
+
+
+print(make_link('https://codingbat.com/python/Warmup-1'))
+
+
+# linkList.append(link.text, realUrl)
+# # f = open("links.txt", "a")
+# # f.write(text + "\n\n" + realUrl + "\n\n")
+# f.close
+
+# HERE I WAS TRYING TO FIGURE OUT BEAUTIFUL SOUP AND HOW TO CRAWL AROUND
 # indent = content.find('div', attrs={"class": "indent"})
 # table = indent.find('table')
 # links = table.find("tr")
