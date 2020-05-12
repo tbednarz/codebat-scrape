@@ -1,13 +1,19 @@
+# TO DO
+# 1. Login to site to get users answers
+
 # you need these two to scrape
 from bs4 import BeautifulSoup
 import requests
-import array
+# import array
 
 # provide url to requests.get() to get the sites data
 urlHalf = 'codingbat.com'
-# turn the response into soup
+
 
 # provide a url "https://codingbat.com/python OR java /Warmup-1, Warmup-2 etc"
+# still need to implement
+
+
 print("Would you like Python or java solutions?")
 question_one_answer = input()
 
@@ -34,10 +40,11 @@ def get_answers(links):
         table = indentDiv.find("form", {"name": "codeform"})
         aceDiv = table.find("div", id="ace_div")
 
-        aceLayer = aceDiv.find("div", class_="ace_line")
+        # aceLayer = aceDiv.find("div", class_="ace_line")
         print(aceDiv.text)
 
 
+# just for helping during testing
 if question_one_answer == "python":
     get_answers(make_link("https://codingbat.com/python/Warmup-1"))
 else:
