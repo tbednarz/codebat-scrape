@@ -4,65 +4,57 @@
 # you need these two to scrape
 from bs4 import BeautifulSoup
 import requests
-# import array
+import os.path
+from os import path
 
-# provide url to requests.get() to get the sites data
+
 urlHalf = 'codingbat.com'
 
+# get login info
+print("what is your email")
+inputOne = input()
+print("password")
+inputTwo = input()
 
-# provide a url "https://codingbat.com/python OR java /Warmup-1, Warmup-2 etc"
-# still need to implement
-
-
-print("Would you like Python or java solutions?")
-question_one_answer = input()
-
-
-def make_link(url):
-    response = requests.get(url, timeout=5)
-    content = BeautifulSoup(response.content, "html.parser")
-    links = content.find_all("a", href=lambda href: href and "prob" in href)
-    linkList = {}
-    for link in links:
-        text = link.text
-        backUrl = link.get("href")
-        realUrl = "http://" + urlHalf + backUrl
-        linkList.update({text: realUrl})
-    return linkList
+# login
+login_url = "https://codingbat.com/login"
+request_url = "https://codingbat.com/java/Warmup-1"
+post_params = {
+    "uname": inputOne,
+    "pw": inputTwo,
+}
 
 
-def get_answers(links):
-    for i in links:
-        response = requests.get(links[i])
+# scrape answers and write to answers.txt
+
+
+def scrape():
+    f = open('answers.txt', 'w')
+    with requests.Session() as session:
+        post = session.post(login_url, data=post_params)
+        r = session.get(request_url)
+
+       # get links to problems
+        content = BeautifulSoup(r.content, "lxml")
+        links = content.find_all(
+            "a", href=lambda href: href and "prob" in href)
+        linkList = {}
+        for link in links:
+            text = link.text
+            backUrl = link.get("href")
+            realUrl = "http://" + urlHalf + backUrl
+            linkList.update({text: realUrl})
+        # print(linkList)
+
+    # get solutions
+    for i in linkList:
+        response = session.get(linkList[i])
         content = BeautifulSoup(response.content, "lxml")
-
         indentDiv = content.find(class_="indent")
         table = indentDiv.find("form", {"name": "codeform"})
         aceDiv = table.find("div", id="ace_div")
+        f.write(i + ": " + linkList[i] + "\n\n")
+        f.write(aceDiv.text + "\n")
 
-        # aceLayer = aceDiv.find("div", class_="ace_line")
-        print(aceDiv.text)
 
-
-# just for helping during testing
-if question_one_answer == "python":
-    get_answers(make_link("https://codingbat.com/python/Warmup-1"))
-else:
-    get_answers(make_link("https://codingbat.com/java/Warmup-1"))
-
-# linkList.append(link.text, realUrl)
-# # f = open("links.txt", "a")
-# # f.write(text + "\n\n" + realUrl + "\n\n")
-# f.close
-
-# HERE I WAS TRYING TO FIGURE OUT BEAUTIFUL SOUP AND HOW TO CRAWL AROUND
-# indent = content.find('div', attrs={"class": "indent"})
-# table = indent.find('table')
-# links = table.find("tr")
-# data = links.find('td')
-# realLinks = data.findAll('a')
-
-# for links in table:
-#     for data in links:
-#         for realLinks in data:
-#             print(realLinks)
+scrape()
