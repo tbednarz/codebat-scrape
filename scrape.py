@@ -1,11 +1,7 @@
-# TO DO
-# 1. Login to site to get users answers
-
 # you need these two to scrape
 from bs4 import BeautifulSoup
 import requests
-# import os.path
-# from os import path
+
 
 
 urlHalf = 'codingbat.com'
