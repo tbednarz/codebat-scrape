@@ -34,7 +34,7 @@ request_url = "https://codingbat.com/java/"
 
 
 def scrape_java():
-    f = open('answers.java', 'w')
+    f = open('answers/answers.java', 'w')
     with requests.Session() as session:
         post = session.post(login_url, data=post_params)
         for ends in end_urls:
