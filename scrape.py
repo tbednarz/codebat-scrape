@@ -22,6 +22,7 @@ java_url = "https://codingbat.com/java/"
 
 
 def get_href():
+    print("Getting directories")
     href_array = []
     initial = requests.get(base_url)
     soup = BeautifulSoup(initial.content, "lxml")
@@ -34,7 +35,7 @@ def get_href():
 
 def gather_links():
     directories = get_href()
-
+    print("Getting problem links")
     link_array = []
     for directory in directories:
         r = requests.get(java_url + directory)
@@ -49,6 +50,7 @@ def gather_links():
 def join_links():
     linkList = gather_links()
     new_link_list = {}
+    print("Joining links")
     for link in linkList:
         for each in link:
             text = each.text
@@ -64,6 +66,7 @@ def scrape_data():
     with requests.Session() as session:
         post = session.post(login_url, data=post_params)
     for i in linkList:
+        print("Scraping: " + i)
         response = session.get(linkList[i])
         content = BeautifulSoup(response.content, "lxml")
         indentDiv = content.find(class_="indent")
