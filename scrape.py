@@ -1,5 +1,7 @@
+
 from bs4 import BeautifulSoup
 import requests
+
 
 urlHalf = 'codingbat.com'
 
