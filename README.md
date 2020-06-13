@@ -1,5 +1,4 @@
 # codebat-scrape
-Scrape problems and solutions from codingbat
- requires BeautifulSoup, Requests and Path
+Scraping problem sets and solutions from codingbat.com
 
-Run this script to log into codingbat and scrape problems/solutions then write to file
+```run python scrape.py or python -m scrape```
