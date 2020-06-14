@@ -1,81 +1,79 @@
 
 from bs4 import BeautifulSoup
 import requests
+import getpass
 
-
-urlHalf = 'codingbat.com'
-
-print("what is your email")
-inputOne = input(">")
-print("password")
-inputTwo = input(">")
-
-post_params = {
-    "uname": inputOne,
-    "pw": inputTwo,
-}
+DOMAIN = 'codingbat.com'
 
 # urls to use
-base_url = "https://codingbat.com"
-login_url = "https://codingbat.com/login"
-java_url = "https://codingbat.com/java/"
+BASE_URL = "https://" + DOMAIN
+LOGIN_URL = BASE_URL + "/login"
+JAVA_URL = BASE_URL + "/java/"
 
 
-def get_href():
+def get_problem_directories():
     print("Getting directories")
     href_array = []
-    initial = requests.get(base_url)
+    initial = requests.get(BASE_URL)
     soup = BeautifulSoup(initial.content, "lxml")
     tab_data = soup.find(class_="floatleft")
     hrefs = tab_data.find_all(class_="h2")
     for href in hrefs:
         href_array.append(href.text)
-    return(href_array)
+    return href_array
 
 
 def gather_links():
-    directories = get_href()
-    print("Getting problem links")
+    directories = get_problem_directories()
     link_array = []
+    print("Getting problem links")
     for directory in directories:
-        r = requests.get(java_url + directory)
+        response = requests.get(JAVA_URL + directory)
         # get links to problems
-        content = BeautifulSoup(r.content, "lxml")
+        content = BeautifulSoup(response.content, "lxml")
         links = content.find_all(
             "a", href=lambda href: href and "prob" in href)
         link_array.append(links)
-    return(link_array)
+    return link_array
 
 
 def join_links():
-    linkList = gather_links()
+    link_list = gather_links()
     new_link_list = {}
     print("Joining links")
-    for link in linkList:
+    for link in link_list:
         for each in link:
             text = each.text
-            backUrl = each.get("href")
-            realUrl = "http://" + urlHalf + backUrl
-            new_link_list.update({text: realUrl})
+            back_url = each.get("href")
+            real_url = "https://" + DOMAIN + back_url
+            new_link_list.update({text: real_url})
     return new_link_list
 
 
 def scrape_data():
-    f = open('answers/answers.java', 'w')
-    linkList = join_links()
-    with requests.Session() as session:
-        post = session.post(login_url, data=post_params)
-    for i in linkList:
-        print("Scraping: " + i)
-        response = session.get(linkList[i])
-        content = BeautifulSoup(response.content, "lxml")
-        indentDiv = content.find(class_="indent")
-        table = indentDiv.find("form", {"name": "codeform"})
-        aceDiv = table.find("div", id="ace_div")
-        f.write("//" + i + ": " + linkList[i] + "\n\n")
-        f.write(aceDiv.text + "\n")
-    print("done")
+    link_dict = join_links()
+    with open('answers/answers.java', 'w') as f:
+        with requests.Session() as session:
+            post = session.post(LOGIN_URL, data=post_params)
+            for title, url in link_dict.items():
+                print("Scraping: " + title)
+                response = session.get(link_dict[title])
+                content = BeautifulSoup(response.content, "lxml")
+                indentDiv = content.find(class_="indent")
+                table = indentDiv.find("form", {"name": "codeform"})
+                aceDiv = table.find("div", id="ace_div")
+                f.write("//" + title + ": " + link_dict[title] + "\n\n")
+                f.write(aceDiv.text + "\n")
+            print("done")
 
 
 if __name__ == "__main__":
+    print("what is your email")
+    input_one = input(">")
+    print("Password")
+    input_two = getpass.getpass()
+    post_params = {
+        "uname": input_one,
+        "pw": input_two,
+    }
     scrape_data()
