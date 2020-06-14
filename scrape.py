@@ -10,6 +10,8 @@ BASE_URL = "https://" + DOMAIN
 LOGIN_URL = BASE_URL + "/login"
 JAVA_URL = BASE_URL + "/java/"
 
+# scrapes home page for each directories title to be used in url building
+
 
 def get_problem_directories():
     print("Getting directories")
@@ -21,6 +23,8 @@ def get_problem_directories():
     for href in hrefs:
         href_array.append(href.text)
     return href_array
+
+# uses the returned directories from get_problem_directories to cycle through and scrape each problems link
 
 
 def gather_links():
@@ -36,6 +40,8 @@ def gather_links():
         link_array.append(links)
     return link_array
 
+# build links to be scraped
+
 
 def join_links():
     link_list = gather_links()
@@ -48,6 +54,8 @@ def join_links():
             real_url = "https://" + DOMAIN + back_url
             new_link_list.update({text: real_url})
     return new_link_list
+
+# login to site and joined links to scrape codeblocks and write to a file
 
 
 def scrape_data():
